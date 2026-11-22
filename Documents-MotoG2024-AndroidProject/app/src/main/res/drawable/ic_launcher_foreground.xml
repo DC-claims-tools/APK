@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Subtle shadow card -->
+    <path
+        android:pathData="M34,27 L64,27 L77,40 L77,81 C77,83.2 75.2,85 73,85 L34,85 C31.8,85 30,83.2 30,81 L30,31 C30,28.8 31.8,27 34,27 Z"
+        android:fillColor="#020617"
+        android:fillAlpha="0.35" />
+    <!-- Primary paper sheet -->
+    <path
+        android:pathData="M33,24 L63,24 L76,37 L76,78 C76,80.2 74.2,82 72,82 L33,82 C30.8,82 29,80.2 29,78 L29,28 C29,25.8 30.8,24 33,24 Z"
+        android:fillColor="#F8FAFC" />
+    <!-- Folded corner -->
+    <path
+        android:pathData="M63,24 L63,34 C63,35.7 64.3,37 66,37 L76,37 Z"
+        android:fillColor="#CBD5E1" />
+    <!-- Teal header accent bar -->
+    <path
+        android:pathData="M37,35 L56,35 C57.1,35 58,35.9 58,37 L58,39 C58,40.1 57.1,41 56,41 L37,41 C35.9,41 35,40.1 35,39 L35,37 C35,35.9 35.9,35 37,35 Z"
+        android:fillColor="#14B8A6" />
+    <!-- Text lines -->
+    <path
+        android:pathData="M37,48 L67,48 C67.8,48 68.5,48.7 68.5,49.5 C68.5,50.3 67.8,51 67,51 L37,51 C36.2,51 35.5,50.3 35.5,49.5 C35.5,48.7 36.2,48 37,48 Z"
+        android:fillColor="#64748B" />
+    <path
+        android:pathData="M37,56 L67,56 C67.8,56 68.5,56.7 68.5,57.5 C68.5,58.3 67.8,59 67,59 L37,59 C36.2,59 35.5,58.3 35.5,57.5 C35.5,56.7 36.2,56 37,56 Z"
+        android:fillColor="#94A3B8" />
+    <path
+        android:pathData="M37,64 L59,64 C59.8,64 60.5,64.7 60.5,65.5 C60.5,66.3 59.8,67 59,67 L37,67 C36.2,67 35.5,66.3 35.5,65.5 C35.5,64.7 36.2,64 37,64 Z"
+        android:fillColor="#94A3B8" />
+    <!-- Emerald badge dot -->
+    <path
+        android:pathData="M65,68 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"
+        android:fillColor="#14B8A6" />
+</vector>
