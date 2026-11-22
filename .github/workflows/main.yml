@@ -30,12 +30,12 @@ jobs:
           gradle-version: '8.10.2'
 
       - name: Build Docs APK
-        working-directory: DocsStudio-MotoG2024-AndroidProject
+        working-directory: Documents-MotoG2024-AndroidProject
         run: gradle assembleDebug --no-daemon
 
       - name: Upload finished APK
         uses: actions/upload-artifact@v4
         with:
           name: Docs-Moto-G-2024-APK
-          path: DocsStudio-MotoG2024-AndroidProject/app/build/outputs/apk/debug/*.apk
+          path: Documents-MotoG2024-AndroidProject/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
