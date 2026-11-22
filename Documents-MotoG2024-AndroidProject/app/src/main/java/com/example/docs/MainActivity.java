@@ -79,7 +79,6 @@ public class MainActivity extends Activity {
     private static final int OPEN_FILE = 41, SAVE_AS = 42, EXPORT_PNG = 43;
 
     private boolean darkMode = true;
-    private int bg(), surface(), card(), border(), ink(), muted(), brand(), pale(), onBrand(), ripple();
     private int bg() { return darkMode ? Color.rgb(11, 17, 32) : Color.rgb(248, 250, 252); }
     private int surface() { return darkMode ? Color.rgb(17, 24, 39) : Color.WHITE; }
     private int card() { return darkMode ? Color.rgb(30, 41, 59) : Color.WHITE; }
