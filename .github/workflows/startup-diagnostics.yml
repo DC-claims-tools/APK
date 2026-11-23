@@ -40,7 +40,7 @@ jobs:
           profile: pixel_4
           emulator-options: -no-window -no-audio -no-boot-anim
           script: |
-            adb install -r Documents-MotoG2024-AndroidProject/app/build/outputs/apk/debug/app-debug.apk
+            adb install -r $(find Documents-MotoG2024-AndroidProject/app/build/outputs/apk/debug/ -name '*x86_64*debug.apk' | head -1)
             adb logcat -c
             echo "=== Launch main app ==="
             adb shell am start -W -n com.example.docs.debug/com.example.docs.MainActivity
@@ -58,10 +58,7 @@ jobs:
             adb shell dumpsys activity activities > startup-activities.txt
             adb logcat -d -v threadtime > startup-logcat.txt
             echo "=== Check fatal exceptions for our package ==="
-            if grep -A 10 'FATAL EXCEPTION' startup-logcat.txt | grep -q 'Process: com.example.docs.debug'; then
-              grep -A 45 -B 3 'FATAL EXCEPTION' startup-logcat.txt | tail -130
-              exit 1
-            fi
+            if grep -A 10 'FATAL EXCEPTION' startup-logcat.txt | grep -q 'Process: com.example.docs.debug'; then echo 'CRASH IN DOCUMENT STUDIO'; exit 1; fi
             echo "Main and toolbox both launched without detected fatal exceptions."
       - name: Upload startup diagnostic logs
         if: always()
@@ -77,6 +74,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Documents-Studio-6-PDF-OCR-APK
-          path: Documents-MotoG2024-AndroidProject/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: warn
+          name: Documents-Studio-6-MotoG2024-Optimized-APK
+          path: Documents-MotoG2024-AndroidProject/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+          if-no-files-found: error
