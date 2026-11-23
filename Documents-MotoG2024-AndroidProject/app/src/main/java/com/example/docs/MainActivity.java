@@ -180,10 +180,16 @@ public class MainActivity extends Activity {
             int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
             if (!darkMode) flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
             getWindow().getDecorView().setSystemUiVisibility(flags);
-        } else if (getWindow().getInsetsController() != null) {
-            int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-                    | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
-            getWindow().getInsetsController().setSystemBarsAppearance(darkMode ? 0 : mask, mask);
+        } else {
+            // PhoneWindow.getInsetsController() can throw before the decor view exists.
+            // Query the decor view directly and apply appearance when it is attached.
+            android.view.WindowInsetsController controller =
+                    getWindow().getDecorView().getWindowInsetsController();
+            if (controller != null) {
+                int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                        | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                controller.setSystemBarsAppearance(darkMode ? 0 : mask, mask);
+            }
         }
     }
 
@@ -215,6 +221,7 @@ public class MainActivity extends Activity {
             return windowInsets;
         });
         setContentView(shell);
+        configureSystemBars();
         shell.requestApplyInsets();
     }
 
