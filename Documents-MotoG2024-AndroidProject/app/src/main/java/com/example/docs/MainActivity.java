@@ -301,6 +301,11 @@ public class MainActivity extends Activity {
         drawerItem(body, R.drawable.ic_star, "Starred", homeTab == 1 && kind.isEmpty(), () -> { closeDrawer(); confirmLeaveToTab(1); });
         drawerItem(body, R.drawable.ic_folder, "Browse Device Files", false, () -> { closeDrawer(); selectFile(); });
 
+        drawerSection(body, "DOCUMENT STUDIO");
+        drawerItem(body, R.drawable.ic_grid, "Power Tools • PDF / OCR / Convert", false, () -> {
+            closeDrawer(); openToolbox();
+        });
+
         drawerSection(body, "CREATE NEW");
         drawerItem(body, R.drawable.ic_add, "Text Note (.txt)", false, () -> { closeDrawer(); createNewDoc("Untitled.txt", "text", ""); });
         drawerItem(body, R.drawable.ic_add, "Markdown (.md)", false, () -> { closeDrawer(); createNewDoc("Notes.md", "text", "# Document Title\n\n"); });
@@ -636,17 +641,35 @@ public class MainActivity extends Activity {
     }
 
     private void showCreateOrOpenSheet() {
-        String[] opts = {"Open File from Device", "New Text Note (.txt)", "New Markdown (.md)", "New Spreadsheet (.csv)"};
+        String[] opts = {"Open File from Device", "Document Studio • PDF & OCR Tools", "New Text Note (.txt)", "New Markdown (.md)", "New Spreadsheet (.csv)"};
         new AlertDialog.Builder(this).setTitle("Documents")
                 .setItems(opts, (d, which) -> {
                     if (which == 0) selectFile();
-                    else if (which == 1) createNewDoc("Untitled.txt", "text", "");
-                    else if (which == 2) createNewDoc("Notes.md", "text", "# Heading\n\n");
+                    else if (which == 1) openToolbox();
+                    else if (which == 2) createNewDoc("Untitled.txt", "text", "");
+                    else if (which == 3) createNewDoc("Notes.md", "text", "# Heading\n\n");
                     else createNewDoc("Sheet.csv", "csv", "Column A,Column B,Column C\n,,\n,,");
                 }).show();
     }
 
+    private void openToolbox() {
+        try { startActivity(new Intent(this, ToolboxActivity.class)); }
+        catch (Exception e) { error("Cannot open tools: " + e.getMessage()); }
+    }
+
     private void drawWorkspace(boolean starredOnly) {
+        if (!starredOnly) {
+            LinearLayout studio = column();
+            studio.setPadding(dp(16), dp(14), dp(14), dp(14));
+            studio.setBackground(rippleBg(card(), 14, border()));
+            studio.addView(text("DOCUMENT STUDIO 6.0", 11, brand(), true));
+            studio.addView(text("PDF Tools, OCR & Conversions", 17, ink(), true));
+            studio.addView(text("Merge, split, reorder, encrypt, scan text, create PDFs and more.", 12, muted(), false));
+            LinearLayout.LayoutParams stp = lp(-1, -2);
+            stp.bottomMargin = dp(16);
+            content.addView(studio, stp);
+            studio.setOnClickListener(v -> openToolbox());
+        }
         // Integrated Search Bar + Sort trigger
         LinearLayout searchBox = new LinearLayout(this);
         searchBox.setOrientation(LinearLayout.HORIZONTAL);
