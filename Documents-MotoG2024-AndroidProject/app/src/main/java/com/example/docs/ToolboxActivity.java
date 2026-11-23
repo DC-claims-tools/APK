@@ -688,7 +688,8 @@ public class ToolboxActivity extends Activity {
     }
     private File createTextPdf(String content)throws Exception{
         File out=temp(".pdf");
-        try(PdfDocument document=new PdfDocument()){
+        PdfDocument document=new PdfDocument();
+        try{
             int width=595,height=842;
             Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
             paint.setColor(Color.rgb(30,41,59));paint.setTextSize(13);
@@ -715,7 +716,8 @@ public class ToolboxActivity extends Activity {
             }
             if(page!=null)document.finishPage(page);
             try(OutputStream stream=new FileOutputStream(out)){document.writeTo(stream);}
-        }return out;
+        }finally{document.close();}
+        return out;
     }
     private void qrPrompt(){
         ask("Create QR code","","Type a web link or any text",true,false,s->{
