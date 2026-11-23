@@ -46,10 +46,29 @@ jobs:
             adb shell am start -W -n com.example.docs.debug/com.example.docs.MainActivity
             sleep 5
             adb shell pidof com.example.docs.debug | tee startup-pid.txt
-            echo "=== Launch toolbox ==="
-            adb shell am start -W -n com.example.docs.debug/com.example.docs.ToolboxActivity
+            echo "=== Open toolbox via the app's home card ==="
+            adb shell uiautomator dump /sdcard/document-studio-window.xml
+            adb pull /sdcard/document-studio-window.xml window.xml
+            python3 - <<'PY'
+            import re, subprocess, xml.etree.ElementTree as ET
+            root=ET.parse('window.xml').getroot()
+            found=False
+            for node in root.iter('node'):
+                if 'PDF Tools, OCR & Conversions' in node.get('text',''):
+                    bounds=node.get('bounds','')
+                    coords=list(map(int,re.findall(r'\\d+',bounds)))
+                    if len(coords)==4:
+                        subprocess.run(['adb','shell','input','tap',str((coords[0]+coords[2])//2),
+                            str((coords[1]+coords[3])//2)],check=True)
+                        found=True
+                        break
+            if not found: raise SystemExit('Document Studio home card missing from UI')
+            PY
             sleep 5
             adb shell pidof com.example.docs.debug | tee -a startup-pid.txt
+            adb shell uiautomator dump /sdcard/toolbox-window.xml
+            adb pull /sdcard/toolbox-window.xml toolbox-window.xml
+            grep -q "Document Toolbox" toolbox-window.xml || { echo "Toolbox screen not displayed"; exit 1; }
             adb shell dumpsys activity activities > startup-activities.txt
             adb logcat -d -v threadtime > startup-logcat.txt
             echo "=== Check fatal exceptions for our package ==="
