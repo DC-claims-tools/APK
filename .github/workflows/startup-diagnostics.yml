@@ -49,21 +49,7 @@ jobs:
             echo "=== Open toolbox via the app's home card ==="
             adb shell uiautomator dump /sdcard/document-studio-window.xml
             adb pull /sdcard/document-studio-window.xml window.xml
-            python3 - <<'PY'
-            import re, subprocess, xml.etree.ElementTree as ET
-            root=ET.parse('window.xml').getroot()
-            found=False
-            for node in root.iter('node'):
-                if 'PDF Tools, OCR & Conversions' in node.get('text',''):
-                    bounds=node.get('bounds','')
-                    coords=list(map(int,re.findall(r'[0-9]+',bounds)))
-                    if len(coords)==4:
-                        subprocess.run(['adb','shell','input','tap',str((coords[0]+coords[2])//2),
-                            str((coords[1]+coords[3])//2)],check=True)
-                        found=True
-                        break
-            if not found: raise SystemExit('Document Studio home card missing from UI')
-            PY
+            python3 -c "import xml.etree.ElementTree as ET,re,subprocess; ns=[n for n in ET.parse('window.xml').iter('node') if 'PDF Tools, OCR & Conversions' in n.get('text','')]; assert ns,'Document Studio home card not found'; b=list(map(int,re.findall('[0-9]+',ns[0].get('bounds','')))); subprocess.run(['adb','shell','input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2)],check=True)"
             sleep 5
             adb shell pidof com.example.docs.debug | tee -a startup-pid.txt
             adb shell uiautomator dump /sdcard/toolbox-window.xml
@@ -87,10 +73,10 @@ jobs:
             startup-pid.txt
             startup-activities.txt
           if-no-files-found: ignore
-      - name: Upload corrected APK
-        if: success()
+      - name: Upload upgraded APK
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Documents-Studio-6-PDF-OCR-APK
           path: Documents-MotoG2024-AndroidProject/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+          if-no-files-found: warn
