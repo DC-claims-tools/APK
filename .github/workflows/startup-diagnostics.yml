@@ -1,9 +1,12 @@
-name: Diagnose Android startup crash
+name: Build and verify Documents Studio 6.0
 on:
   push:
     paths:
       - '.github/workflows/startup-diagnostics.yml'
-      - 'Documents-MotoG2024-AndroidProject/app/src/main/java/com/example/docs/MainActivity.java'
+      - 'Documents-MotoG2024-AndroidProject/app/src/main/java/com/example/docs/**'
+      - 'Documents-MotoG2024-AndroidProject/app/build.gradle'
+      - 'Documents-MotoG2024-AndroidProject/gradle.properties'
+      - 'Documents-MotoG2024-AndroidProject/app/src/main/AndroidManifest.xml'
   workflow_dispatch:
 
 jobs:
@@ -21,7 +24,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
-      - name: Build untouched app
+      - name: Build complete Documents Studio app
         working-directory: Documents-MotoG2024-AndroidProject
         run: gradle assembleDebug --no-daemon
       - name: Enable KVM
@@ -39,15 +42,22 @@ jobs:
           script: |
             adb install -r Documents-MotoG2024-AndroidProject/app/build/outputs/apk/debug/app-debug.apk
             adb logcat -c
-            adb shell am start -W -n com.example.docs.debug/com.example.docs.MainActivity || true
-            sleep 6
+            echo "=== Launch main app ==="
+            adb shell am start -W -n com.example.docs.debug/com.example.docs.MainActivity
+            sleep 5
+            adb shell pidof com.example.docs.debug | tee startup-pid.txt
+            echo "=== Launch toolbox ==="
+            adb shell am start -W -n com.example.docs.debug/com.example.docs.ToolboxActivity
+            sleep 5
+            adb shell pidof com.example.docs.debug | tee -a startup-pid.txt
+            adb shell dumpsys activity activities > startup-activities.txt
             adb logcat -d -v threadtime > startup-logcat.txt
-            adb shell pidof com.example.docs.debug > startup-pid.txt || true
-            adb shell dumpsys activity activities > startup-activities.txt || true
-            echo "==== STARTUP PROCESS ===="
-            cat startup-pid.txt
-            echo "==== JAVA EXCEPTIONS ===="
-            grep -A 45 -B 3 -E "FATAL EXCEPTION|AndroidRuntime|Process: com.example.docs.debug|Error inflating|Could not start|Unable to start activity" startup-logcat.txt | tail -200 || true
+            echo "=== Check fatal exceptions for our package ==="
+            if grep -A 10 'FATAL EXCEPTION' startup-logcat.txt | grep -q 'Process: com.example.docs.debug'; then
+              grep -A 45 -B 3 'FATAL EXCEPTION' startup-logcat.txt | tail -130
+              exit 1
+            fi
+            echo "Main and toolbox both launched without detected fatal exceptions."
       - name: Upload startup diagnostic logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -62,6 +72,6 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: Documents-MotoG2024-Startup-Fixed
+          name: Documents-Studio-6-PDF-OCR-APK
           path: Documents-MotoG2024-AndroidProject/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
