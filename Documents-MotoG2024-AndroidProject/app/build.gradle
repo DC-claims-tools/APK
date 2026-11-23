@@ -14,6 +14,15 @@ android {
         versionName "6.0"
     }
 
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'arm64-v8a', 'x86_64'
+            universalApk false
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -22,6 +31,9 @@ android {
         }
         debug {
             applicationIdSuffix ".debug"
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
         }
     }
 
