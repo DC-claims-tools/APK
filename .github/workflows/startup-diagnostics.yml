@@ -56,7 +56,7 @@ jobs:
             for node in root.iter('node'):
                 if 'PDF Tools, OCR & Conversions' in node.get('text',''):
                     bounds=node.get('bounds','')
-                    coords=list(map(int,re.findall(r'\\d+',bounds)))
+                    coords=list(map(int,re.findall(r'[0-9]+',bounds)))
                     if len(coords)==4:
                         subprocess.run(['adb','shell','input','tap',str((coords[0]+coords[2])//2),
                             str((coords[1]+coords[3])//2)],check=True)
